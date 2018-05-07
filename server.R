@@ -1,14 +1,23 @@
 library(tidyverse)
+dat <- read_csv("./data/data_copy.csv") %>% 
+  as_tibble() %>% 
+  rename(Kode = "Code",
+         Provinsi = "Prov",
+         Lokasi = "Loc")
+
+deskripsi_dat <- read_csv("./data/datadescriptor.csv") %>% 
+  as_tibble() %>% 
+  select(-`Column no`)
 
 server <- function(input, output){
-  dat <- read_csv("data_copy.csv") %>% 
-    as_tibble() %>% 
-    rename(Kode = "Code",
-           Provinsi = "Prov",
-           Lokasi = "Loc")
-  deskripsi_dat <- read_csv("datadescriptor.csv") %>% 
-    as_tibble() %>% 
-    select(-`Column no`)
+  # dat <- read_csv("thermostats/data/data_copy.csv") %>% 
+  #   as_tibble() %>% 
+  #   rename(Kode = "Code",
+  #          Provinsi = "Prov",
+  #          Lokasi = "Loc")
+  # deskripsi_dat <- read_csv("thermostats/data/datadescriptor.csv") %>% 
+  #   as_tibble() %>% 
+  #   select(-`Column no`)
   
   output$data <- renderDataTable({
     datatable(dat,
