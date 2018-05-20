@@ -1,5 +1,6 @@
 # thermostats
 
-Proyek bertujuan untuk membuat basis data sampel air termal (air panas) dengan fitur analisis menggunakah Shinny Apps. 
+Proyek bertujuan untuk membuat sebuah aplikasi analisis statistik sederhana berbasis data sampel air termal (air panas) dengan fitur analisis menggunakah Shinny Apps. Inspirasi awalnya berasal dari https://data.worldbank.org/. 
 
-Kontributor: Prana Ugi Gio.
+Data dan ide: Dasapta Erwin Irawan
+Pengembang R Shiny: Prana Ugi Gio (kami mengundang kontribusi dari pengguna R dan Github lainnya)
