@@ -1,102 +1,97 @@
-library(tidyverse)
-dat <- read_csv("./data/data_copy.csv") %>% 
-  as_tibble() %>% 
-  rename(Kode = "Code",
-         Provinsi = "Prov",
-         Lokasi = "Loc")
-
-deskripsi_dat <- read_csv("./data/datadescriptor.csv") %>% 
-  as_tibble() %>% 
-  select(-`Column no`)
-
-server <- function(input, output){
-  # dat <- read_csv("thermostats/data/data_copy.csv") %>% 
-  #   as_tibble() %>% 
-  #   rename(Kode = "Code",
-  #          Provinsi = "Prov",
-  #          Lokasi = "Loc")
-  # deskripsi_dat <- read_csv("thermostats/data/datadescriptor.csv") %>% 
-  #   as_tibble() %>% 
-  #   select(-`Column no`)
-  
-  output$data <- renderDataTable({
-    datatable(dat,
-              options = list(
-                lengthMenu = list(c(5, 10, 20, -1), c("5", "10", "20", "All")),
-                pageLength = 10,
-                searching = FALSE,
-                autoWidth = FALSE,
-                scrollX = TRUE,
-                initComplete = JS(
-                  "function(settings, json) {",
-                  "$(this.api().table().header()).css({'background-color': '#3c8dbc', 'color': '#fff'});",
-                  "}"
-                )
+server <- function(input, output) {
+  output$dataset <- DT::renderDataTable({
+    dataset %>% 
+      datatable(
+        rownames = FALSE,
+        extensions = c("Scroller", "Buttons"),
+        options = list(
+          dom = "Brfti",
+          autoWidth = FALSE,
+          scrollX = TRUE,
+          deferRender = TRUE,
+          scrollY = 300,
+          scroller = TRUE,
+          buttons =
+            list(
+              list(
+                extend = "copy"
               ),
-              rownames = FALSE
-    )
-  })
-  
-  output$deskripsi <- renderDataTable({
-    datatable(deskripsi_dat,
-              options = list(
-                lengthMenu = list(c(5, 10, 20, -1), c("5", "10", "20", "All")),
-                pageLength = 10,
-                searching = FALSE,
-                autoWidth = FALSE,
-                scrollX = TRUE,
-                initComplete = JS(
-                  "function(settings, json) {",
-                  "$(this.api().table().header()).css({'background-color': '#3c8dbc', 'color': '#fff'});",
-                  "}"
-                )
-              ),
-              rownames = FALSE
-    )
-  })
-  
-  
-  grafik <- eventReactive(input$terapkan, {
-    if (input$jenis_grafik == "batang") {
-      ggplot(dat,
-             aes(x = input$sumbu_x,
-                 y = input$sumbu_y)) + 
-      geom_bar()
-    }
-    if (input$jenis_grafik == "garis") {
-      ggplot(dat,
-             aes(x = input$sumbu_x,
-                 y = input$sumbu_y)) + 
-        geom_line()
-    }
-    if (input$jenis_grafik == "titik") {
-      ggplot(dat,
-             aes(x = input$sumbu_x,
-                 y = input$sumbu_y)) + 
-        geom_point()
-    }
-  })
-  
-  output$grafik <- renderPlot({
-    plot(grafik())
-  })
-  
-  observeEvent(input$terapkan, {
-    output$unduh_rancangan <- renderUI({
-      downloadButton(
-        outputId = "simpan_grafik",
-        label = "Simpan Grafik"
+              list(
+                extend = "collection",
+                buttons = c("csv", "excel"),
+                text = "Download"
+              )
+            )
+          ,
+          initComplete = JS(
+            "function(settings, json) {",
+            "$(this.api().table().header()).css({'background-color': '#44ade9', 'color': '#fff'});",
+            "}"
+          )
+        )
       )
-    })
-  })
-  
-  output$simpan_grafik <- downloadHandler(
-    filename = function() {
-      paste0("Grafik ", input$jenis_grafik,".png")
-    },
-    content = function(file) {
-      ggsave(file, plot = grafik(), device = "png")
-    }
+  },
+  server = FALSE
   )
   
+  output$description <- DT::renderDataTable({
+    description %>% 
+      datatable(
+        rownames = FALSE,
+        extensions = c("Scroller", "Buttons"),
+        options = list(
+          dom = "Brfti",
+          autoWidth = FALSE,
+          scrollX = TRUE,
+          deferRender = TRUE,
+          scrollY = 300,
+          scroller = TRUE,
+          buttons =
+            list(
+              list(
+                extend = "copy"
+              ),
+              list(
+                extend = "collection",
+                buttons = c("csv", "excel"),
+                text = "Download"
+              )
+            )
+          ,
+          initComplete = JS(
+            "function(settings, json) {",
+            "$(this.api().table().header()).css({'background-color': '#44ade9', 'color': '#fff'});",
+            "}"
+          )
+        )
+      )
+  },
+  server = FALSE
+  )
+  
+  observe({
+    toggleState(id = "apply_scatterplot",
+                condition = !is.null(input$province) & !is.null(input$x_axis) & !is.null(input$y_axis))
+  })
+  
+  scatterplot <- eventReactive(input$apply_scatterplot, {
+    res_plot <- dataset %>% 
+      filter(Province == input$province)  %>% 
+      ggplot(aes_string(x = input$x_axis, y = input$y_axis)) +
+      geom_point(aes_string(col = if_else(input$pointscolour, "Province", "NULL"))) +
+      labs(col = "") +
+      theme_minimal()
+    
+    if (input$regressionline) {
+      res_plot <- res_plot + geom_smooth(method = "lm", na.rm = TRUE)
+    } else {
+      res_plot
+    }
+    return(res_plot)
+  })
+  
+  output$scatterplot <- renderPlotly({
+    scatterplot() %>% 
+      ggplotly()
+  })
 }
