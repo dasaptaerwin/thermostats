@@ -1,4 +1,6 @@
 server <- function(input, output) {
+  hide(id = "loading-content", anim = TRUE, animType = "fade")
+  show("app-content")
   # Data ----
   ## Dataset ----
   output$dataset <- DT::renderDataTable({
@@ -232,4 +234,6 @@ server <- function(input, output) {
   },
   server = FALSE
   )
+
+  callModule(statDescriptive, "descriptive")
 }
