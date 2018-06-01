@@ -8,6 +8,8 @@ library(DT)
 library(plotly)
 library(ggcorrplot)
 
+invisible(map(list.files("./module", full.names = TRUE), source))
+
 dataset <- read_csv("./data/data_copy.csv") %>%
   as_tibble() %>%
   select(-Code) %>%
