@@ -1,7 +1,7 @@
 ui <- tagList(
   useShinyjs(),
   navbarPage(
-    strong("Thermostat"),
+    "Thermostat",
     theme = shinytheme("cerulean"),
     tabPanel(
       "Data",

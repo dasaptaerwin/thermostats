@@ -159,12 +159,12 @@ server <- function(input, output) {
       p_mat <- dataset %>%
         filter(Province == input$province_corrplot) %>%
         select(input$parameters) %>%
-        cor_pmat()
+        ggcorrplot::cor_pmat()
       res_plot <- dataset %>%
         filter(Province == input$province_corrplot) %>%
         select(input$parameters) %>%
         cor() %>%
-        ggcorrplot(
+        ggcorrplot::ggcorrplot(
           method = "square",
           ggtheme = theme_minimal,
           outline.color = "white",
@@ -176,7 +176,7 @@ server <- function(input, output) {
         filter(Province == input$province_corrplot) %>%
         select(input$parameters) %>%
         cor() %>%
-        ggcorrplot(
+        ggcorrplot::ggcorrplot(
           method = "square",
           ggtheme = theme_minimal,
           outline.color = "white",
