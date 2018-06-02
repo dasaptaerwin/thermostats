@@ -1,3 +1,6 @@
+invisible(map(list.files("./module", full.names = TRUE), source))
+invisible(map(list.files("./helper/", full.names = TRUE), source))
+
 ui <- tagList(
   useShinyjs(),
   inlineCSS(
@@ -23,7 +26,7 @@ ui <- tagList(
     div(
       id = "app-content",
       navbarPage(
-        "Thermostat",
+        "Thermostats",
         theme = shinytheme("cerulean"),
         tabPanel(
           "Data",
