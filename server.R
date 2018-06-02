@@ -235,5 +235,5 @@ server <- function(input, output) {
   server = FALSE
   )
 
-  callModule(statDescriptive, "descriptive")
+  callModule(statMultivariate, "multivariate")
 }
