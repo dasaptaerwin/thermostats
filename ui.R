@@ -164,11 +164,18 @@ ui <- tagList(
         navbarMenu(
           "Statistic",
           tabPanel(
-            "Descriptive",
-            statDescriptiveUI("descriptive")
+            "Descriptive"
           ),
-          tabPanel("Correlation"),
-          tabPanel("Regression")
+          tabPanel(
+            "Correlation"
+            ),
+          tabPanel(
+            "Regression"
+            ),
+          tabPanel(
+            "Multivariate",
+            statMultivariateUI("multivariate")
+          )
         ),
         tabPanel(
           "About",
