@@ -1,3 +1,15 @@
+library(shiny)
+library(shinythemes)
+library(shinyjs)
+library(shinyWidgets)
+library(shinycssloaders)
+library(tidyverse)
+library(DT)
+library(plotly)
+library(ggcorrplot)
+library(ggrepel)
+library(FactoMineR)
+
 invisible(map(list.files("./module", full.names = TRUE), source))
 invisible(map(list.files("./helper/", full.names = TRUE), source))
 
