@@ -13,7 +13,6 @@ library(FactoMineR)
 invisible(map(list.files("./module", full.names = TRUE), source))
 invisible(map(list.files("./helper/", full.names = TRUE), source))
 
-
 dataset <- read_csv("./data/data_copy.csv") %>%
   as_tibble() %>%
   select(-Code) %>%
