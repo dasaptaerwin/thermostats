@@ -1,32 +1,16 @@
-library(shiny)
-library(shinythemes)
-library(shinyjs)
-library(shinyWidgets)
-library(shinycssloaders)
-library(tidyverse)
-library(DT)
-library(plotly)
-library(ggcorrplot)
-library(ggrepel)
-library(FactoMineR)
-
-invisible(map(list.files("./module", full.names = TRUE), source))
-invisible(map(list.files("./helper/", full.names = TRUE), source))
-
 ui <- tagList(
   useShinyjs(),
   inlineCSS(
     "
 #loading-content {
   position: absolute;
-  background: #000000;
+  background: #FFFFFF;
   opacity: 0.9;
   z-index: 100;
   left: 0;
   right: 0;
   height: 100%;
   text-align: center;
-  color: #FFFFFF;
 }
 "
   ),

@@ -172,21 +172,21 @@ statMultivariate <- function(input, output, session) {
   df <- eventReactive(input$apply, {
     if (input$profile == "Province") {
       dataset %>%
+        select(Province, one_of(input$parameter, input$parameter_supp)) %>%
         filter(Province %in% input$province) %>% 
-        select(Province, input$parameter, input$parameter_supp) %>%
         group_by(Province) %>%
         summarise_if(is.numeric, mean, na.rm = TRUE) %>%
         rename(Profile = Province)
     } else if (input$profile == "Location") {
       dataset %>%
-        filter(Province %in% input$location) %>% 
-        select(Province, Location, input$parameter, input$parameter_supp) %>%
+        select(Province, Location, one_of(input$parameter, input$parameter_supp)) %>%
+        filter(Location %in% input$location) %>% 
         group_by(Location) %>%
         summarise_if(is.numeric, mean, na.rm = TRUE) %>%
         rename(Profile = Location)
     } else if (input$profile == "Location within Province") {
       dataset %>%
-        select(Province, Location, input$parameter, input$parameter_supp) %>%
+        select(Province, Location, one_of(input$parameter, input$parameter_supp)) %>%
         filter(Province %in% input$province_ops) %>% 
         filter(Location %in% input$location_ops) %>%
         group_by(Location) %>%
