@@ -1,4 +1,4 @@
-# Thermostats: make you own hot stats
+# Thermostats: make your own hot stats
 
 Proyek bertujuan untuk membuat sebuah aplikasi analisis statistik sederhana berbasis data sampel air termal (air panas) dengan fitur analisis menggunakah Shinny Apps. Inspirasi awalnya berasal dari https://data.worldbank.org/. 
 
