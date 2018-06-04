@@ -1,0 +1,12 @@
+name: thermostats
+title: thermostats
+username:
+account: aswansyahputra
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 352450
+bundleId: 1409628
+url: https://aswansyahputra.shinyapps.io/thermostats/
+when: 1528094475.46584
+asMultiple: FALSE
+asStatic: FALSE
