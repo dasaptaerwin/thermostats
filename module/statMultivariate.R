@@ -96,6 +96,7 @@ statMultivariateUI <- function(id) {
             "Dimension",
             icon = icon("plus"),
             h3("Description of dimension"),
+            withSpinner(plotOutput(ns("screeplot")), type = 4, color = "#44ade9"),
             withSpinner(verbatimTextOutput(ns("dimension")), type = 4, color = "#44ade9")
           ),
           tabPanel(
@@ -112,23 +113,38 @@ statMultivariateUI <- function(id) {
                   width = "350px",
                   tooltip = tooltipOptions(title = "Options"),
                   selectInput(
-                    inputId = ns("options"),
-                    label = "Plot Options",
-                    choices = c("Screeplot", "Profile", "Parameter")
+                    ns("options"),
+                    "Plot Options",
+                    choices = c("Profile", "Parameter")
                   ),
                   numericInput(
-                    inputId = ns("x_axis"),
-                    label = "Dimension on x axis",
+                    ns("x_axis"),
+                    "Dimension on x axis",
                     min = 1,
                     max = 4,
                     value = 1
                   ),
                   numericInput(
-                    inputId = ns("y_axis"),
-                    label = "Dimension on y axis",
+                    ns("y_axis"),
+                    "Dimension on y axis",
                     min = 2,
                     max = 5,
                     value = 2
+                  ),
+                  materialSwitch(
+                    ns("repel"),
+                    "Repel text",
+                    value = TRUE,
+                    status = "primary",
+                    right = TRUE
+                  ),
+                  sliderInput(
+                    ns("labsize"),
+                    "Label size",
+                    min = 2,
+                    max = 8,
+                    value = 3,
+                    step = 1
                   )
                 )
               ),
@@ -268,19 +284,24 @@ statMultivariate <- function(input, output, session) {
     return(res)
   })
   
+  output$screeplot <- renderPlot({
+    plot_eigen(global())
+  })
+  
   output$dimension <- renderPrint({
     dimdesc(global(), proba = 1)
   })
   
   plot <- reactive({
-    if (input$options == "Screeplot") {
-      plot_eigen(global())
-    } else if (input$options == "Profile") {
+    if (input$options == "Profile") {
       plot_profile(global(),
-                   axes = c(input$x_axis, input$y_axis))
+                   axes = c(input$x_axis, input$y_axis),
+                   repel = input$repel,
+                   lab.size = input$labsize)
     } else if (input$options == "Parameter") {
       plot_parameter(res = global(),
-                     axes = c(input$x_axis, input$y_axis))
+                     axes = c(input$x_axis, input$y_axis),
+                     lab.size = input$labsize)
     }
   })
   
