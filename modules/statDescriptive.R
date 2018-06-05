@@ -137,6 +137,7 @@ statDescriptive <- function(input, output, session) {
       method = "render",
       omit.headings = TRUE,
       bootstrap.css = FALSE,
+      custom.css = "./www/custom-summarytools.css",
       footnote = NA
     )
   })
