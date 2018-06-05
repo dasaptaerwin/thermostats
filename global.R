@@ -10,8 +10,8 @@ library(ggcorrplot)
 library(ggrepel)
 library(FactoMineR)
 
-invisible(map(list.files("./module", full.names = TRUE), source))
-invisible(map(list.files("./helper/", full.names = TRUE), source))
+invisible(map(list.files("./modules", full.names = TRUE), source))
+invisible(map(list.files("./helpers", full.names = TRUE), source))
 
 dataset <- read_csv("./data/data_copy.csv") %>%
   as_tibble() %>%
@@ -23,5 +23,4 @@ dataset <- read_csv("./data/data_copy.csv") %>%
 
 description <- read_csv("./data/datadescriptor.csv") %>%
   as_tibble() %>%
-  select(-`Column no`) %>%
-  `[`(-c(1:4, 37:65), )
+  `[`(-c(1:4, 37:65), -1)

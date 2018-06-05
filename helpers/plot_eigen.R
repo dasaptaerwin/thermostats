@@ -12,7 +12,7 @@ plot_eigen <- function(res, threshold = TRUE) {
     geom_bar(stat = "identity") +
     # geom_text(aes(label = `percentage of variance`), vjust = -1, size = 3) +
     labs(
-      x = "Dimensi",
+      x = "Dimension",
       y = "Eigenvalue",
       title = "Screeplot"
     ) +

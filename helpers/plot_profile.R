@@ -46,6 +46,6 @@ plot_profile <- function(res, axes = c(1, 2), repel = TRUE, main = "", lab.size 
         panel.grid = element_blank()
       )
   }
-  
+
   return(res_plot)
 }

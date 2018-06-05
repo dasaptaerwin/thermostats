@@ -149,8 +149,8 @@ statMultivariateUI <- function(id) {
                 )
               ),
               column(11,
-                     align = "center",
-                     withSpinner(plotOutput(ns("plot"), width = "600px", height = "400px"), type = 4, color = "#44ade9")
+                align = "center",
+                withSpinner(plotOutput(ns("plot"), width = "600px", height = "400px"), type = 4, color = "#44ade9")
               )
             )
           )
@@ -177,7 +177,7 @@ statMultivariate <- function(input, output, session) {
   },
   ignoreInit = TRUE
   )
-  
+
   observe({
     toggleState(
       id = "apply",
@@ -189,21 +189,21 @@ statMultivariate <- function(input, output, session) {
     if (input$profile == "Province") {
       dataset %>%
         select(Province, one_of(input$parameter, input$parameter_supp)) %>%
-        filter(Province %in% input$province) %>% 
+        filter(Province %in% input$province) %>%
         group_by(Province) %>%
         summarise_if(is.numeric, mean, na.rm = TRUE) %>%
         rename(Profile = Province)
     } else if (input$profile == "Location") {
       dataset %>%
         select(Province, Location, one_of(input$parameter, input$parameter_supp)) %>%
-        filter(Location %in% input$location) %>% 
+        filter(Location %in% input$location) %>%
         group_by(Location) %>%
         summarise_if(is.numeric, mean, na.rm = TRUE) %>%
         rename(Profile = Location)
     } else if (input$profile == "Location within Province") {
       dataset %>%
         select(Province, Location, one_of(input$parameter, input$parameter_supp)) %>%
-        filter(Province %in% input$province_ops) %>% 
+        filter(Province %in% input$province_ops) %>%
         filter(Location %in% input$location_ops) %>%
         group_by(Location) %>%
         summarise_if(is.numeric, mean, na.rm = TRUE) %>%
@@ -228,10 +228,10 @@ statMultivariate <- function(input, output, session) {
   output$overview <- renderTable({
     overview()
   }, colnames = FALSE)
-  
+
   output$dataset <- DT::renderDataTable({
     df() %>%
-      mutate_if(is.numeric, round, 2) %>% 
+      mutate_if(is.numeric, round, 2) %>%
       datatable(
         rownames = FALSE,
         extensions = c("Scroller", "Buttons"),
@@ -264,7 +264,7 @@ statMultivariate <- function(input, output, session) {
   },
   server = FALSE
   )
-  
+
   global <- reactive({
     req(df())
     if (is.null(input$parameter_supp)) {
@@ -274,7 +274,7 @@ statMultivariate <- function(input, output, session) {
         select_if(is.numeric)
       quanti_supp <- NULL
     } else {
-      dat <- df() %>% 
+      dat <- df() %>%
         as.data.frame() %>%
         `rownames<-`(.[, "Profile"]) %>%
         select_if(is.numeric)
@@ -283,28 +283,31 @@ statMultivariate <- function(input, output, session) {
     res <- PCA(dat, quanti.sup = quanti_supp, graph = FALSE)
     return(res)
   })
-  
+
   output$screeplot <- renderPlot({
     plot_eigen(global())
   })
-  
+
   output$dimension <- renderPrint({
     dimdesc(global(), proba = 1)
   })
-  
+
   plot <- reactive({
     if (input$options == "Profile") {
       plot_profile(global(),
-                   axes = c(input$x_axis, input$y_axis),
-                   repel = input$repel,
-                   lab.size = input$labsize)
+        axes = c(input$x_axis, input$y_axis),
+        repel = input$repel,
+        lab.size = input$labsize
+      )
     } else if (input$options == "Parameter") {
-      plot_parameter(res = global(),
-                     axes = c(input$x_axis, input$y_axis),
-                     lab.size = input$labsize)
+      plot_parameter(
+        res = global(),
+        axes = c(input$x_axis, input$y_axis),
+        lab.size = input$labsize
+      )
     }
   })
-  
+
   output$plot <- renderPlot({
     plot()
   })
