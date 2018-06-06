@@ -4,7 +4,7 @@
 Proyek bertujuan untuk membuat sebuah aplikasi analisis statistik sederhana berbasis data sampel air termal (air panas) dengan fitur analisis menggunakah Shinny Apps. Inspirasi awalnya berasal dari https://data.worldbank.org/. 
 
 -----
-Ingat Proyek Thermostats yang saya sebarkan dua bulan lalu? Kini versi 1 dari proyek itu sudah tayang. Silahkan mampir di bit.ly/thermostats_v2.
+Ingat Proyek Thermostats yang saya sebarkan dua bulan lalu? Kini versi 1 dari proyek itu sudah tayang. Silahkan mampir di https://bit.ly/thermostats_v2.
 
 Proyek ini merupakan kolaborasi dari:
 
