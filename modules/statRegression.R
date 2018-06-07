@@ -1,4 +1,4 @@
-statDescriptiveUI <- function(id) {
+statRegressionUI <- function(id) {
   ns <- NS(id)
   tagList(
     sidebarLayout(
@@ -60,27 +60,42 @@ statDescriptiveUI <- function(id) {
           )
         ),
         pickerInput(
-          ns("parameter"),
-          "Please select parameter to investigate",
+          ns("dependent"),
+          "Please select a dependent variable",
           choices = colnames(dataset)[-c(1, 2)],
+          selected = "Mg",
+          options = list(
+            "live-search" = TRUE
+          )
+        ),
+        pickerInput(
+          ns("independent"),
+          "Please select one or several independent variable(s)",
+          choices = colnames(dataset)[-c(1, 2)],
+          selected = c("Na", "Br"),
           multiple = TRUE,
           options = list(
-            "actions-box" = TRUE
+            "actions-box" = TRUE,
+            "live-search" = TRUE
           )
         ),
         actionButton(ns("apply"), "Apply")
       ),
       mainPanel(
-        h3("Summary Table"),
-        withSpinner(htmlOutput(ns("summary")), type = 4, color = "#44ade9")
+        h3("Summary of Statistic"),
+        withSpinner(tableOutput(ns("result")), type = 4, color = "#44ade9"),
+        withSpinner(tableOutput(ns("result2")), type = 4, color = "#44ade9"),
+        hr(),
+        h3("Plot"),
+        withSpinner(plotlyOutput(ns("plot")), type = 4, color = "#44ade9")
       )
     )
   )
 }
 
-statDescriptive <- function(input, output, session) {
+statRegression <- function(input, output, session) {
   ns <- session$ns
-
+  
   observeEvent(input$province_ops, {
     loc <- dataset %>%
       filter(Province %in% input$province_ops) %>%
@@ -95,41 +110,74 @@ statDescriptive <- function(input, output, session) {
   },
   ignoreInit = TRUE
   )
-
+  
   observe({
     toggleState(
       id = "apply",
-      condition = !is.null(input$parameter)
+      condition = !is.null(input$dependent) & !is.null(input$independent)
     )
   })
-
+  
   df <- eventReactive(input$apply, {
     if (input$profile == "All") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter))
+        select(Province, Location, one_of(input$dependent, input$independent))
     } else if (input$profile == "Province") {
       dataset %>%
-        select(Province, one_of(input$parameter)) %>%
+        select(Province, one_of(input$dependent, input$independent)) %>%
         filter(Province %in% input$province)
     } else if (input$profile == "Location") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter)) %>%
+        select(Province, Location, one_of(input$dependent, input$independent)) %>%
         filter(Location %in% input$location)
+      rename(Profile = Location)
     } else if (input$profile == "Location within Province") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter)) %>%
+        select(Province, Location, one_of(input$dependent, input$independent)) %>%
         filter(Province %in% input$province_ops) %>%
         filter(Location %in% input$location_ops)
     }
   })
+  
+  result <- eventReactive(input$apply, {
+    formula = paste(input$dependent, "~", paste(input$independent, collapse = " + "))
+    df() %>% 
+      ntbt(lm, formula = as.formula(formula)) %>% 
+      tidy() %>% 
+      `colnames<-`(tools::toTitleCase(names(.)))
+  })
+  
+  output$result <- renderTable({
+    result()
+  })
+  
+  result2 <- eventReactive(input$apply, {
+    formula = paste(input$dependent, "~", paste(input$independent, collapse = " + "))
+    df() %>% 
+      ntbt(lm, formula = as.formula(formula)) %>% 
+      glance() %>% 
+      `colnames<-`(tools::toTitleCase(names(.)))
+  })
+  
+  output$result2 <- renderTable({
+    result2()
+  })
+  
+  estimateplot <- eventReactive(input$apply, {
+    formula = paste(input$dependent, "~", paste(input$independent, collapse = " + "))
+    df() %>% 
+      ntbt(lm, formula = as.formula(formula)) %>% 
+      tidy(conf.int = TRUE) %>% 
+      `colnames<-`(tools::toTitleCase(names(.))) %>% 
+      ggplot(aes(Estimate, Term, color = Term)) +
+      geom_point(size = 3) +
+      geom_errorbarh(aes(xmin = Conf.low, xmax = Conf.high), height = 0.3) +
+      labs(col = "") +
+      theme_minimal()
+  })
 
-  output$summary <- renderUI({
-    print(dfSummary(df(), varnumbers = FALSE, graph.magnif = 0.8, style = "multiline"),
-      method = "render",
-      omit.headings = TRUE,
-      bootstrap.css = FALSE,
-      custom.css = "./www/custom-summarytools.css",
-      footnote = NA
-    )
+  output$plot <- renderPlotly({
+    estimateplot() %>%
+      ggplotly()
   })
 }

@@ -6,15 +6,21 @@ server <- function(input, output) {
 
   # Plot ----
   ## Scatterplot ----
-  callModule(plotScatterplot, "scatterplot")
+  callModule(plotScatterplot, "plot_scatterplot")
 
   ## Correlation Plot ----
-  callModule(plotCorrelation, "correlation")
+  callModule(plotCorrelation, "plot_correlation")
 
   # Statistic ----
   ## Descriptive ----
-  callModule(statDescriptive, "descriptive")
+  callModule(statDescriptive, "stat_descriptive")
+  
+  ## Correlation ----
+  callModule(statCorrelation, "stat_correlation")
+  
+  ## Regression ----
+  callModule(statRegression, "stat_regression")
 
   ## Multivariate
-  callModule(statMultivariate, "multivariate")
+  callModule(statMultivariate, "stat_multivariate")
 }

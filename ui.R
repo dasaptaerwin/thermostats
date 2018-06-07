@@ -32,28 +32,30 @@ ui <- tagList(
           "Plot",
           tabPanel(
             "Scatterplot",
-            plotScatterplotUI("scatterplot")
+            plotScatterplotUI("plot_scatterplot")
           ),
           tabPanel(
             "Correlation Plot",
-            plotCorrelationUI("correlation")
+            plotCorrelationUI("plot_correlation")
           )
         ),
         navbarMenu(
           "Statistic",
           tabPanel(
             "Descriptive",
-            statDescriptiveUI("descriptive")
+            statDescriptiveUI("stat_descriptive")
           ),
           tabPanel(
-            "Correlation"
+            "Correlation",
+            statCorrelationUI("stat_correlation")
           ),
           tabPanel(
-            "Regression"
+            "Regression",
+            statRegressionUI("stat_regression")
           ),
           tabPanel(
             "Multivariate",
-            statMultivariateUI("multivariate")
+            statMultivariateUI("stat_multivariate")
           )
         ),
         tabPanel(
