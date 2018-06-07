@@ -168,7 +168,8 @@ statRegression <- function(input, output, session) {
     df() %>% 
       ntbt(lm, formula = as.formula(formula)) %>% 
       tidy(conf.int = TRUE) %>% 
-      `colnames<-`(tools::toTitleCase(names(.))) %>% 
+      `colnames<-`(tools::toTitleCase(names(.))) %>%
+      mutate(Term = factor(Term, levels = unique(Term))) %>% 
       ggplot(aes(Estimate, Term, color = Term)) +
       geom_point(size = 3) +
       geom_errorbarh(aes(xmin = Conf.low, xmax = Conf.high), height = 0.3) +
