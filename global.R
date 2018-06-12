@@ -8,6 +8,8 @@ library(DT)
 library(plotly)
 library(ggcorrplot)
 library(summarytools)
+library(intubate)
+library(broom)
 library(ggrepel)
 library(FactoMineR)
 

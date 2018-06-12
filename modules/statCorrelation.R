@@ -1,4 +1,4 @@
-statDescriptiveUI <- function(id) {
+statCorrelationUI <- function(id) {
   ns <- NS(id)
   tagList(
     sidebarLayout(
@@ -60,25 +60,60 @@ statDescriptiveUI <- function(id) {
           )
         ),
         pickerInput(
-          ns("parameter"),
-          "Please select parameter to investigate",
+          ns("x"),
+          "Please select a parameter to investigate",
           choices = colnames(dataset)[-c(1, 2)],
-          multiple = TRUE,
+          selected = "Mg",
           options = list(
-            "actions-box" = TRUE
+            "live-search" = TRUE
           )
+        ),
+        pickerInput(
+          ns("y"),
+          "Please select another parameter to investigate",
+          choices = colnames(dataset)[-c(1, 2)],
+          selected = "Na",
+          options = list(
+            "live-search" = TRUE
+          )
+        ),
+        radioButtons(
+          ns("alternative"),
+          "Alternative Hypothesis",
+          choices = c(
+            "Two-sided" = "two.sided",
+            "Less than" = "less",
+            "Greater than" = "greater"
+          )
+        ),
+        radioButtons(
+          ns("method"),
+          "Test Method",
+          choices = c(
+            "Pearson" = "pearson",
+            "Kendall" = "kendall",
+            "Spearman" = "spearman"
+          )
+        ),
+        numericInput(
+          ns("conf.level"),
+          "Confidence Level",
+          min = 0.8, max = 1, value = 0.95
         ),
         actionButton(ns("apply"), "Apply")
       ),
       mainPanel(
-        h3("Summary Table"),
-        withSpinner(htmlOutput(ns("summary")), type = 4, color = "#44ade9")
+        h3("Summary of Statistic"),
+        withSpinner(tableOutput(ns("result")), type = 4, color = "#44ade9"),
+        hr(),
+        h3("Plot"),
+        withSpinner(plotlyOutput(ns("plot")), type = 4, color = "#44ade9")
       )
     )
   )
 }
 
-statDescriptive <- function(input, output, session) {
+statCorrelation <- function(input, output, session) {
   ns <- session$ns
 
   observeEvent(input$province_ops, {
@@ -99,37 +134,54 @@ statDescriptive <- function(input, output, session) {
   observe({
     toggleState(
       id = "apply",
-      condition = !is.null(input$parameter)
+      condition = !is.null(input$x) & !is.null(input$y)
     )
   })
 
   df <- eventReactive(input$apply, {
     if (input$profile == "All") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter))
+        select(Province, Location, one_of(input$x, input$y))
     } else if (input$profile == "Province") {
       dataset %>%
-        select(Province, one_of(input$parameter)) %>%
+        select(Province, one_of(input$x, input$y)) %>%
         filter(Province %in% input$province)
     } else if (input$profile == "Location") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter)) %>%
+        select(Province, Location, one_of(input$x, input$y)) %>%
         filter(Location %in% input$location)
+      rename(Profile = Location)
     } else if (input$profile == "Location within Province") {
       dataset %>%
-        select(Province, Location, one_of(input$parameter)) %>%
+        select(Province, Location, one_of(input$x, input$y)) %>%
         filter(Province %in% input$province_ops) %>%
         filter(Location %in% input$location_ops)
     }
   })
 
-  output$summary <- renderUI({
-    print(dfSummary(df(), varnumbers = FALSE, graph.magnif = 0.8, style = "multiline"),
-      method = "render",
-      omit.headings = TRUE,
-      bootstrap.css = FALSE,
-      custom.css = "./www/custom-summarytools.css",
-      footnote = NA
-    )
+  result <- eventReactive(input$apply, {
+    formula <- paste("~", input$x, "+", input$y)
+    df() %>%
+      ntbt(cor.test, formula = as.formula(formula), alternative = input$alternative, method = input$method, conf.level = input$conf.level) %>%
+      tidy() %>% 
+      `colnames<-`(tools::toTitleCase(names(.)))
+  })
+
+  output$result <- renderTable({
+    result()
+  })
+
+  scatterplot <- eventReactive(input$apply, {
+    df() %>%
+      ggplot(aes_string(x = input$x, y = input$y)) +
+      geom_point() +
+      geom_smooth(method = "lm", na.rm = TRUE) +
+      labs(col = "") +
+      theme_minimal()
+  })
+
+  output$plot <- renderPlotly({
+    scatterplot() %>%
+      ggplotly()
   })
 }
